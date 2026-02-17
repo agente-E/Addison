@@ -9,6 +9,9 @@ class SetupCombat(commands.Cog):
 
     async def setup_combat(self, user1: discord.User, user2: discord.User) -> bool:
 
+        if user1 == user2:
+            return False
+
         guild: discord.Guild | None = self.bot.get_guild(self.__guild_id)
 
         if guild is None:
@@ -29,10 +32,15 @@ class SetupCombat(commands.Cog):
             " ", "-"
         )
 
+        inversed_category_name: str = (
+            f"combate-{member2.name}-{member1.name}".lower().replace(" ", "-")
+        )
+
         # Evade duplicates
-        existing = discord.utils.get(guild.categories, name=category_name)
-        if existing:
-            return existing
+        if discord.utils.get(guild.categories, name=category_name) or discord.utils.get(
+            guild.categories, name=inversed_category_name
+        ):
+            return False
 
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(view_channel=False),
@@ -44,6 +52,8 @@ class SetupCombat(commands.Cog):
             ),
             guild.me: discord.PermissionOverwrite(view_channel=True),
         }
+
+        print("Arrived here anyways")
 
         category: discord.CategoryChannel = await guild.create_category(
             name=category_name, overwrites=overwrites, reason="Creación de combate"

@@ -19,19 +19,24 @@ class TestUtils(commands.Cog):
         user1: discord.User,
         user2: discord.User,
     ):
-        create_cog: SetupCombat | None = self.bot.get_cog("CreateChannels")
+        create_cog: SetupCombat | None = self.bot.get_cog("SetupCombat")
 
         if create_cog is None:
             await interaction.response.send_message(
-                "CreateChannels cog no está cargado.", ephemeral=True
+                "SetupCombat cog no está cargado.", ephemeral=True
             )
             return
 
         await create_cog.setup_combat(user1, user2)
 
-        await interaction.response.send_message(
-            "Canales creados correctamente.", ephemeral=True
-        )
+        if await create_cog.setup_combat(user1, user2):
+            await interaction.response.send_message(
+                "Canales creados correctamente.", ephemeral=True
+            )
+        else:
+            await interaction.response.send_message(
+                "Error al crear los canales", ephemeral=True
+            )
 
 
 async def setup(bot):
